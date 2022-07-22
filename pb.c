@@ -80,7 +80,7 @@ void check() {
 			push(i);
 		} else if(c[i]==']' || c[i]==')') { 
 			if(sp==n) error(15,i,"ERR: Unbalanced");
-			if(s[sp]==c[i]) error(15,i,"ERR: Unbalanced");
+			if(s[sp]!=c[i]) error(16,i,"ERR: Unbalanced");
 			
 			pop();
 		}
