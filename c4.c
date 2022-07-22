@@ -11,6 +11,7 @@
 #include <memory.h>
 #include <unistd.h>
 #include <fcntl.h>
+
 #define int long long
 
 char *p, *lp, // current position in source code
@@ -35,9 +36,9 @@ enum {
 };
 
 // opcodes
-enum { LEA = 0 ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,
+enum { LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,
        OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,
-       OPEN,READ,WRIT,CLOS,PCHR,GCHR,PRTF,MALC,FREE,MSET,MCMP,EXIT };
+       OPEN,READ,WRIT,CLOS,PCHR,GCHR,PRTF,SCNF,MALC,FREE,MSET,MCMP,MCPY,EXIT };
 
 // types
 enum { CHAR, INT, PTR };
@@ -49,7 +50,7 @@ void next()
 {
   char *pp;
 
-  while (tk = *p) {
+  while ((tk = *p)) {
     ++p;
     if (tk == '\n') {
       if (src) {
@@ -58,7 +59,7 @@ void next()
         while (le < e) {
           printf("%8.4s", &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                            "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-                           "OPEN,READ,WRIT,CLOS,PCHR,GCHR,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[*++le * 5]);
+                           "OPEN,READ,WRIT,CLOS,PCHR,GCHR,PRTFSCNF,MALC,FREE,MSET,MCMP,MCPY,EXIT,"[*++le * 5]);
           if (*le <= ADJ) printf(" %d\n", *++le); else printf("\n");
         }
       }
@@ -354,7 +355,7 @@ int main(int argc, char **argv)
   memset(data, 0, poolsz);
 
   p = "char else enum if int return sizeof while "
-      "open read write close putchar getchar printf malloc free memset memcmp exit void main";
+      "open read write close putchar getchar printf scanf malloc free memset memcmp memcpy exit void main";
   i = Char; while (i <= While) { next(); id[Tk] = i++; } // add keywords to symbol table
   i = OPEN; while (i <= EXIT) { next(); id[Class] = Sys; id[Type] = INT; id[Val] = i++; } // add library to symbol table
   next(); id[Tk] = Char; // handle void type
@@ -479,7 +480,7 @@ int main(int argc, char **argv)
       printf("%d> %.4s", cycle,
         &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
          "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-         "OPEN,READ,WRIT,CLOS,PCHR,GCHR,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[i * 5]);
+         "OPEN,READ,WRIT,CLOS,PCHR,GCHR,PRTF,SCNF,MALC,FREE,MSET,MCMP,MCPY,EXIT,"[i * 5]);
       if (i <= ADJ) printf(" %d\n", *pc); else printf("\n");
     }
     if      (i == LEA) a = (int)(bp + *pc++);                             // load local address
@@ -521,10 +522,12 @@ int main(int argc, char **argv)
     else if (i == PCHR) a = putchar(*sp);
     else if (i == GCHR) a = getchar();
     else if (i == PRTF) { t = sp + pc[1]; a = printf((char *)t[-1], t[-2], t[-3], t[-4], t[-5], t[-6]); }
+    else if (i == SCNF) { t = sp + pc[1]; a = scanf((char *)t[-1], t[-2], t[-3], t[-4], t[-5], t[-6]); }
     else if (i == MALC) a = (int)malloc(*sp);
     else if (i == FREE) free((void *)*sp);
     else if (i == MSET) a = (int)memset((char *)sp[2], sp[1], *sp);
     else if (i == MCMP) a = memcmp((char *)sp[2], (char *)sp[1], *sp);
+    else if (i == MCPY) a = memcpy((char *)sp[2], (char *)sp[1], *sp);
     else if (i == EXIT) { printf("exit(%d) cycle = %d\n", *sp, cycle); return *sp; }
     else { printf("unknown instruction = %d! cycle = %d\n", i, cycle); return -1; }
   }

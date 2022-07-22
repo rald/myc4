@@ -9,48 +9,42 @@ int	MEM_MAX;
 int	STK_MAX;
 int	PRC_MAX;
 
-int *m;
-int *s;
-int *p;
+int *m,*s,*p;
+int mp,cp,sp;
 char *c;
 
-int mp;
-int cp;
-int sp;
-
-int f;
-int n;
+int f,n,i,d,ch;
 char b;
-int i;
-int d;
-int ch;
 
-int ln;
-int cl;
-
+int ln,cl;
 int scp;
 
 
 
 void error(int code,int scp,char *msg) {
 
-	ln=0; cl=0; i=0;
+	ln=0;
+	cl=0;
+	i=0;
 
 	while(i<scp) {
 
 		if(c[i]=='\t') cl=cl+TAB_SIZE;
-		else if(c[i]=='\n') { ln++; cl=0; } 
-		else cl++;
+		else if(c[i]=='\n') {
+			ln++;
+			cl=0;
+		} else cl++;
 
-		i++;				
+		i++;
 	}
 
-	ln++; cl++;
+	ln++;
+	cl++;
 
 	printf("ERR: LN %d CL %d: %s\n",ln,cl,msg);
 
 	exit(code);
-	
+
 }
 
 
@@ -77,24 +71,24 @@ void check() {
 
 		if(c[i]=='[' || c[i]=='(') {
 
-			if(sp==0) error(14,i,"ERR: Stack Overflow"); 
+			if(sp==0) error(14,i,"ERR: Stack Overflow");
 
 			push(i);
-			
-		} else if(c[i]==']' || c[i]==')') { 
+
+		} else if(c[i]==']' || c[i]==')') {
 
 			if(sp==n) error(15,i,"ERR: Unbalanced");
 
-			if(	(c[s[sp]]=='[' && c[i]!=']') || 
-					(c[s[sp]]=='(' && c[i]!=')') )
-				error(16,s[sp],"ERR: Unbalanced");			
+			if(	(c[s[sp]]=='[' && c[i]!=']') ||
+			    (c[s[sp]]=='(' && c[i]!=')') )
+				error(16,s[sp],"ERR: Unbalanced");
 
 			pop();
 		}
 
 		i++;
-	}	
-	if(sp<n) error(17,s[sp],"ERR: Unbalanced"); 
+	}
+	if(sp<n) error(17,s[sp],"ERR: Unbalanced");
 }
 
 
@@ -110,23 +104,23 @@ int main(int argc,char **argv) {
 	MEM_MAX = 65536;
 	STK_MAX = 256;
 	PRC_MAX = 256;
-	
+
 
 
 	if(argc<2) {
 		printf("usage: %s filename\n",argv[0]);
 		return 1;
 	}
-        
+
 	if((f=open(argv[1],0))==-1) {
 		printf("error opening file %s\n",argv[1]);
 		return 2;
-	} 
+	}
 
 	n=0;
-  while(read(f,&b,1)>0) {
-  	n++;
-  }
+	while(read(f,&b,1)>0) {
+		n++;
+	}
 
 	close(f);
 
@@ -138,13 +132,13 @@ int main(int argc,char **argv) {
 	if((f=open(argv[1],0))==-1) {
 		printf("error opening file %s\n",argv[1]);
 		return 4;
-	} 	
+	}
 
 	if(read(f,c,n)!=n) {
 		printf("error reading file\n");
 		return 5;
 	}
-	c[n]=0;	
+	c[n]=0;
 
 	close(f);
 
@@ -164,7 +158,7 @@ int main(int argc,char **argv) {
 		m[i]=0;
 		i++;
 	}
-        
+
 	mp=0;
 	cp=0;
 
@@ -186,26 +180,27 @@ int main(int argc,char **argv) {
 	}
 
 
-	
+
 	while(cp<n) {
 
-		if(c[cp]=='+') { 
-			m[mp]++; 
-			if(m[mp]>255) m[mp]=0; 
-		} else if(c[cp]=='-') { 
-			m[mp]--; 
-			if(m[mp]<0) m[mp]=255; 
-		} else if(c[cp]=='<') { 
-			mp--; 
+		if(c[cp]=='+') {
+			m[mp]++;
+			if(m[mp]>255) m[mp]=0;
+		} else if(c[cp]=='-') {
+			m[mp]--;
+			if(m[mp]<0) m[mp]=255;
+		} else if(c[cp]=='<') {
+			mp--;
 			if(mp<0) error(6,cp,"ERR: Memory Pointer Underflow");
-		} else if(c[cp]=='>') { 
-			mp++; 
+		} else if(c[cp]=='>') {
+			mp++;
 			if(mp>=MEM_MAX) error(7,cp,"ERR: Memory Pointer Overflow");
 		} else if(c[cp]=='.') {
 			putchar(m[mp]);
-		} else if(c[cp]==',') { 
-			ch=getchar(); 
-			if(ch==-1) m[mp]=0; else m[mp]=ch & 0xFF; 
+		} else if(c[cp]==',') {
+			ch=getchar();
+			if(ch==-1) m[mp]=0;
+			else m[mp]=ch & 0xFF;
 		} else if(c[cp]=='[') {
 			scp=cp;
 			if(m[mp]==0) {
@@ -213,7 +208,8 @@ int main(int argc,char **argv) {
 				while(d) {
 					cp++;
 					if(cp>=n) error(8,scp,"ERR: Unbalanced");
-					if(c[cp]=='[') d++; else if(c[cp]==']') d--; 
+					if(c[cp]=='[') d++;
+					else if(c[cp]==']') d--;
 				}
 			}
 		} else if(c[cp]==']') {
@@ -223,7 +219,8 @@ int main(int argc,char **argv) {
 				while(d) {
 					cp--;
 					if(cp<0) error(9,scp,"ERR: Unbalanced");
-					if(c[cp]=='[') d--; else if(c[cp]==']') d++; 
+					if(c[cp]=='[') d--;
+					else if(c[cp]==']') d++;
 				}
 			}
 		} else if(c[cp]=='(') {
@@ -235,7 +232,8 @@ int main(int argc,char **argv) {
 			while(d) {
 				cp++;
 				if(cp>=n) error(10,scp,"ERR: Unbalamced");
-				if(c[cp]=='(') d++; else if(c[cp]==')') d--; 
+				if(c[cp]=='(') d++;
+				else if(c[cp]==')') d--;
 			}
 
 		} else if(c[cp]==')') {
@@ -243,28 +241,28 @@ int main(int argc,char **argv) {
 			if(sp==STK_MAX) error(11,cp,"ERR: Unbalanced");
 
 			cp=pop();
-		
+
 		} else if(c[cp]==':') {
 
 			if(sp==0) error(12,cp,"ERR: Call Stack Overflow");
 			if(p[m[mp]]==-1) error(13,cp,"ERR: Invalid Procedure Number");
-			
+
 			push(cp);
 
 			cp=p[m[mp]];
-			
+
 		} else if(c[cp]=='#' || (cp<n-1 && c[cp]=='/' && c[cp+1]=='/')) {
 			while(c[cp]!='\n' && cp<n) {
 				cp++;
-			}			
+			}
 		} else if(cp<n-1 && c[cp]=='/' && c[cp+1]=='*') {
 			while(cp<n-1 && !(c[cp]=='*' && c[cp+1]=='/')) {
 				cp++;
 			}
-			cp++;				
-		}		
+			cp++;
+		}
 
-		cp++;		
+		cp++;
 
 	}
 
@@ -272,6 +270,8 @@ int main(int argc,char **argv) {
 	free(s);
 	free(m);
 	free(c);
-		
+
 	return 0;
 }
+
+
