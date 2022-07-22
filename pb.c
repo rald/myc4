@@ -76,18 +76,25 @@ void check() {
 	while(i<n) {
 
 		if(c[i]=='[' || c[i]=='(') {
+
 			if(sp==0) error(14,i,"ERR: Stack Overflow"); 
+
 			push(i);
-		} else if(c[i]==']' || c[i]==')') { 
-			if(sp==n) error(15,i,"ERR: Unbalanced");
-			if(s[sp]!=c[i]) error(16,i,"ERR: Unbalanced");
 			
+		} else if(c[i]==']' || c[i]==')') { 
+
+			if(sp==n) error(15,i,"ERR: Unbalanced");
+
+			if(	(c[s[sp]]=='[' && c[i]!=']') || 
+					(c[s[sp]]=='(' && c[i]!=')') )
+				error(16,s[sp],"ERR: Unbalanced");			
+
 			pop();
 		}
 
 		i++;
 	}	
-	if(sp<n) error(16,s[sp],"ERR: Unbalanced"); 
+	if(sp<n) error(17,s[sp],"ERR: Unbalanced"); 
 }
 
 
@@ -246,6 +253,15 @@ int main(int argc,char **argv) {
 
 			cp=p[m[mp]];
 			
+		} else if(c[cp]=='#' || (cp<n-1 && c[cp]=='/' && c[cp+1]=='/')) {
+			while(c[cp]!='\n' && cp<n) {
+				cp++;
+			}			
+		} else if(cp<n-1 && c[cp]=='/' && c[cp+1]=='*') {
+			while(cp<n-1 && !(c[cp]=='*' && c[cp+1]=='/')) {
+				cp++;
+			}
+			cp++;				
 		}		
 
 		cp++;		
