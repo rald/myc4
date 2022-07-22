@@ -3,15 +3,19 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+
+
 int TAB_SIZE;
 
 int	MEM_MAX;
 int	STK_MAX;
 int	PRC_MAX;
 
+
+
 int *m,*s,*p;
-int mp,cp,sp;
 char *c;
+int mp,cp,sp;
 
 int f,n,i,d,ch;
 char b;
@@ -105,17 +109,20 @@ int main(int argc,char **argv) {
 	STK_MAX = 256;
 	PRC_MAX = 256;
 
-
-
+		
 	if(argc<2) {
 		printf("usage: %s filename\n",argv[0]);
 		return 1;
 	}
 
+
+
+
 	if((f=open(argv[1],0))==-1) {
 		printf("error opening file %s\n",argv[1]);
 		return 2;
 	}
+
 
 	n=0;
 	while(read(f,&b,1)>0) {
@@ -124,21 +131,25 @@ int main(int argc,char **argv) {
 
 	close(f);
 
-	if((c=malloc(sizeof(char)*n))==0) {
-		printf("error allocating memory\n");
-		return 3;
-	}
+
+
 
 	if((f=open(argv[1],0))==-1) {
 		printf("error opening file %s\n",argv[1]);
 		return 4;
 	}
 
+
+	if((c=malloc(sizeof(char)*(n+1)))==0) {				printf("error allocating memory\n");
+		return 3;
+	}
+
 	if(read(f,c,n)!=n) {
 		printf("error reading file\n");
 		return 5;
 	}
-	c[n]=0;
+	c[n]='\0';
+
 
 	close(f);
 
@@ -148,6 +159,9 @@ int main(int argc,char **argv) {
 	sp=n;
 
 	check();
+
+	free(s);
+	s=NULL;
 
 
 
@@ -164,10 +178,10 @@ int main(int argc,char **argv) {
 
 
 
-	free(s);
 
 	s=malloc(sizeof(int)*STK_MAX);
 	sp=STK_MAX;
+
 
 
 
@@ -267,9 +281,18 @@ int main(int argc,char **argv) {
 	}
 
 	free(p);
+	p=NULL;
+
 	free(s);
+	s=NULL;
+
 	free(m);
+	m=NULL;
+
 	free(c);
+	c=NULL;
+
+	printf("Bye!");
 
 	return 0;
 }
