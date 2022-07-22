@@ -7,24 +7,15 @@ int TAB_SIZE;
 
 int	MEM_MAX;
 
-int *m;
-int *s;
+int *m,*s;
 char *c;
 
-int mp;
-int cp;
-int sp;
+int mp,cp,sp;
 
-int f;
-int n;
+int f,n,i,d,ch;
 char b;
-int i;
-int d;
-int ch;
 
-int ln;
-int cl;
-
+int ln,cl;
 int scp;
 
 
