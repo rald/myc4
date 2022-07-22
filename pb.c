@@ -292,8 +292,6 @@ int main(int argc,char **argv) {
 	free(c);
 	c=NULL;
 
-	printf("Bye!");
-
 	return 0;
 }
 
