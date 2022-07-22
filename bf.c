@@ -6,12 +6,9 @@
 int TAB_SIZE;
 
 int	MEM_MAX;
-int	STK_MAX;
-int	PRC_MAX;
 
 int *m;
 int *s;
-int *p;
 char *c;
 
 int mp;
@@ -55,56 +52,35 @@ void error(int code,int scp,char *msg) {
 
 
 
-void push(int x) {
-	s[--sp]=x;
-}
-
-
-
-int pop() {
-	int x;
-	x=s[sp++];
-	return x;
-}
-
-
-
 void check() {
+
+	s=malloc(sizeof(int)*n);
+	sp=n;
 
 	i=0;
 
 	while(i<n) {
 
-		if(c[i]=='[' || c[i]=='(') {
-			if(sp==0) error(14,i,"ERR: Stack Overflow"); 
-			push(i);
-		} else if(c[i]==']' || c[i]==')') { 
-			if(sp==n) error(15,i,"ERR: Unbalanced");
-			if(s[sp]==c[i]) error(15,i,"ERR: Unbalanced");
-			
-			pop();
+		if(c[i]=='[') {
+			if(sp==0) error(12,i,"ERR: STACK OVERFLOW"); 
+			s[--sp]=i;
+		} else if(c[i]==']') { 
+			if(sp==n) error(10,i,"ERR: UNBALANCED ]"); 
+			sp++;
 		}
 
 		i++;
 	}	
-	if(sp<n) error(16,s[sp],"ERR: Unbalanced"); 
+	if(sp<n) error(11,s[sp],"ERR: UNBALANCED ["); 
 }
 
 
 
 int main(int argc,char **argv) {
 
-
-
 	TAB_SIZE = 2;
 
-
-
 	MEM_MAX = 65536;
-	STK_MAX = 256;
-	PRC_MAX = 256;
-	
-
 
 	if(argc<2) {
 		printf("usage: %s filename\n",argv[0]);
@@ -143,9 +119,6 @@ int main(int argc,char **argv) {
 
 
 
-	s=malloc(sizeof(int)*n);
-	sp=n;
-
 	check();
 
 
@@ -160,25 +133,6 @@ int main(int argc,char **argv) {
         
 	mp=0;
 	cp=0;
-
-
-
-	free(s);
-
-	s=malloc(sizeof(int)*STK_MAX);
-	sp=STK_MAX;
-
-
-
-	p=malloc(sizeof(int)*PRC_MAX);
-
-	i=0;
-	while(i<PRC_MAX) {
-		p[i]=-1;
-		i++;
-	}
-
-
 	
 	while(cp<n) {
 
@@ -190,10 +144,10 @@ int main(int argc,char **argv) {
 			if(m[mp]<0) m[mp]=255; 
 		} else if(c[cp]=='<') { 
 			mp--; 
-			if(mp<0) error(6,cp,"ERR: Memory Pointer Underflow");
+			if(mp<0) error(6,cp,"ERR: <");
 		} else if(c[cp]=='>') { 
 			mp++; 
-			if(mp>=MEM_MAX) error(7,cp,"ERR: Memory Pointer Overflow");
+			if(mp>=MEM_MAX) error(7,cp,"ERR: >");
 		} else if(c[cp]=='.') {
 			putchar(m[mp]);
 		} else if(c[cp]==',') { 
@@ -205,7 +159,7 @@ int main(int argc,char **argv) {
 				d=1;
 				while(d) {
 					cp++;
-					if(cp>=n) error(8,scp,"ERR: Unbalanced");
+					if(cp>=n) error(8,scp,"ERR: [");
 					if(c[cp]=='[') d++; else if(c[cp]==']') d--; 
 				}
 			}
@@ -215,46 +169,16 @@ int main(int argc,char **argv) {
 				d=1;
 				while(d) {
 					cp--;
-					if(cp<0) error(9,scp,"ERR: Unbalanced");
+					if(cp<0) error(9,scp,"ERR: ]");
 					if(c[cp]=='[') d--; else if(c[cp]==']') d++; 
 				}
 			}
-		} else if(c[cp]=='(') {
-
-			p[m[mp]]=cp;
-
-			scp=cp;
-			d=1;
-			while(d) {
-				cp++;
-				if(cp>=n) error(10,scp,"ERR: Unbalamced");
-				if(c[cp]=='(') d++; else if(c[cp]==')') d--; 
-			}
-
-		} else if(c[cp]==')') {
-
-			if(sp==STK_MAX) error(11,cp,"ERR: Unbalanced");
-
-			cp=pop();
-		
-		} else if(c[cp]==':') {
-
-			if(sp==0) error(12,cp,"ERR: Call Stack Overflow");
-			if(p[m[mp]]==-1) error(13,cp,"ERR: Invalid Procedure Number");
-			
-			push(cp);
-
-			cp=p[m[mp]];
-			
 		}		
 
 		cp++;		
 
 	}
 
-	free(p);
-	free(s);
-	free(m);
 	free(c);
 		
 	return 0;
